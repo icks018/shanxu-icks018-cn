@@ -9,6 +9,16 @@
 
 from pathlib import Path
 from typing import Dict, List, Optional, Callable
+import os
+import logging
+
+# 导入AI处理器
+try:
+    from ..ai.processor import AIProcessor
+except ImportError:
+    AIProcessor = None
+
+logger = logging.getLogger(__name__)
 
 
 def prepare_report_data(
@@ -20,6 +30,7 @@ def prepare_report_data(
     rank_threshold: int = 3,
     matches_word_groups_func: Optional[Callable] = None,
     load_frequency_words_func: Optional[Callable] = None,
+    ai_config: Optional[Dict] = None,
 ) -> Dict:
     """
     准备报告数据
@@ -33,10 +44,21 @@ def prepare_report_data(
         rank_threshold: 排名阈值
         matches_word_groups_func: 词组匹配函数
         load_frequency_words_func: 加载频率词函数
+        ai_config: AI处理配置
 
     Returns:
         Dict: 准备好的报告数据
     """
+    # 初始化AI处理器
+    ai_processor = None
+    if ai_config and AIProcessor:
+        try:
+            ai_processor = AIProcessor(ai_config)
+            if ai_processor.enabled:
+                logger.info("AI智能处理已启用")
+        except Exception as e:
+            logger.error(f"初始化AI处理器失败: {e}")
+    
     processed_new_titles = []
 
     # 在增量模式下隐藏新增新闻区域
@@ -154,6 +176,7 @@ def generate_html_report(
     matches_word_groups_func: Optional[Callable] = None,
     load_frequency_words_func: Optional[Callable] = None,
     enable_index_copy: bool = True,
+    ai_config: Optional[Dict] = None,
 ) -> str:
     """
     生成 HTML 报告
@@ -204,6 +227,7 @@ def generate_html_report(
         rank_threshold,
         matches_word_groups_func,
         load_frequency_words_func,
+        ai_config,
     )
 
     # 渲染 HTML 内容
