@@ -51,13 +51,24 @@ def prepare_report_data(
     """
     # 初始化AI处理器
     ai_processor = None
+    print(f"🔍 调试信息: ai_config = {ai_config}")
+    print(f"🔍 调试信息: AIProcessor = {AIProcessor}")
+    
     if ai_config and AIProcessor:
         try:
+            print("🔍 开始初始化AI处理器...")
             ai_processor = AIProcessor(ai_config)
+            print(f"🔍 AI处理器创建完成，enabled = {ai_processor.enabled}")
             if ai_processor.enabled:
+                print("✅ AI智能处理已启用")
                 logger.info("AI智能处理已启用")
+            else:
+                print("❌ AI智能处理未启用")
         except Exception as e:
+            print(f"❌ 初始化AI处理器失败: {e}")
             logger.error(f"初始化AI处理器失败: {e}")
+    else:
+        print(f"❌ AI配置或处理器不可用: ai_config={bool(ai_config)}, AIProcessor={bool(AIProcessor)}")
     
     processed_new_titles = []
 

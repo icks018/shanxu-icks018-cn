@@ -18,10 +18,15 @@ class ZhipuClient:
             api_key: API密钥，如果为None则从环境变量获取
         """
         self.api_key = api_key or os.getenv("ZHIPU_API_KEY")
+        print(f"🔍 ZhipuClient初始化，API Key存在: {bool(self.api_key)}")
+        
         if not self.api_key:
+            print("❌ 智谱AI API Key未配置")
             raise ValueError("智谱AI API Key未配置")
         
+        print("🔍 创建ZhipuAI客户端...")
         self.client = ZhipuAI(api_key=self.api_key)
+        print("✅ ZhipuAI客户端创建成功")
     
     def generate_summary(self, content: str, title: str, max_length: int = 100) -> str:
         """生成新闻摘要

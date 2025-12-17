@@ -16,6 +16,7 @@ class AIProcessor:
         Args:
             config: AI配置字典
         """
+        print(f"🔍 AIProcessor初始化，config = {config}")
         self.config = config
         self.enabled = config.get("enabled", False)
         self.provider = config.get("provider", "zhipu")
@@ -24,18 +25,26 @@ class AIProcessor:
         self.tags_count = config.get("tags_count", 1)
         self.video_format = config.get("video_format", True)
         
+        print(f"🔍 AI配置: enabled={self.enabled}, provider={self.provider}")
+        
         # 初始化AI客户端
         self.client = None
         if self.enabled:
             try:
+                print(f"🔍 尝试初始化{self.provider}客户端...")
                 if self.provider == "zhipu":
                     self.client = ZhipuClient()
+                    print("✅ ZhipuClient初始化成功")
                 else:
+                    print(f"❌ 不支持的AI提供商: {self.provider}")
                     logger.warning(f"不支持的AI提供商: {self.provider}")
                     self.enabled = False
             except Exception as e:
+                print(f"❌ 初始化AI客户端失败: {e}")
                 logger.error(f"初始化AI客户端失败: {e}")
                 self.enabled = False
+        else:
+            print("❌ AI处理未启用")
     
     def process_news_item(self, news_item: Dict[str, Any]) -> Dict[str, Any]:
         """处理单条新闻
