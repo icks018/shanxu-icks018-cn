@@ -1,0 +1,179 @@
+# Python 相关文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller 打包文件
+*.manifest
+*.spec
+
+# 安装日志
+pip-log.txt
+pip-delete-this-directory.txt
+
+# 单元测试和覆盖率报告
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# 翻译文件
+*.mo
+*.pot
+
+# Django 相关
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask 相关
+instance/
+.webassets-cache
+
+# Scrapy 相关
+.scrapy
+
+# Sphinx 文档
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery 相关
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath 解析文件
+*.sage.py
+
+# 虚拟环境
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder 项目设置
+.spyderproject
+.spyproject
+
+# Rope 项目设置
+.ropeproject
+
+# mkdocs 文档
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre 类型检查器
+.pyre/
+
+# pytype 静态类型分析器
+.pytype/
+
+# Cython 调试符号
+cython_debug/
+
+# PyCharm IDE
+.idea/
+
+# VS Code IDE
+.vscode/
+
+# 项目特定文件
+output/
+*.db
+*.sqlite
+*.sqlite3
+
+# 配置文件中的敏感信息
+# config/config.yaml
+# config/frequency_words.txt
+
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Docker 相关
+.dockerignore
+
+# 备份文件
+*.bak
+*.backup
+
+# GitHub Actions 部署时不需要的文件
+setup-windows.bat
+setup-windows-en.bat
+setup-mac.sh
+start-http.bat
+start-http.sh
+docs/
+mcp_server/
+docker/
+.dockerignore
+
+# Docker自动构建工作流
+.github/workflows/docker.yml
