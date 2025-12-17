@@ -15,7 +15,12 @@ import logging
 # 导入AI处理器
 try:
     from ..ai.processor import AIProcessor
-except ImportError:
+    print("✅ AIProcessor导入成功")
+except ImportError as e:
+    print(f"❌ AIProcessor导入失败: {e}")
+    AIProcessor = None
+except Exception as e:
+    print(f"❌ AIProcessor导入异常: {e}")
     AIProcessor = None
 
 logger = logging.getLogger(__name__)
