@@ -82,47 +82,57 @@ class NotificationDispatcher:
             Dict[str, bool]: 每个渠道的发送结果，key 为渠道名，value 为是否成功
         """
         results = {}
+        
+        # 检查是否有AI处理的内容，优先使用AI格式化内容
+        content_to_send = report_data
+        if report_data.get("ai_processed") and report_data.get("ai_content"):
+            print("🤖 使用AI智能处理后的内容进行推送")
+            # 创建一个包含AI内容的新报告数据
+            content_to_send = {
+                **report_data,
+                "ai_formatted_content": report_data["ai_content"]
+            }
 
         # 飞书
         if self.config.get("FEISHU_WEBHOOK_URL"):
             results["feishu"] = self._send_feishu(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # 钉钉
         if self.config.get("DINGTALK_WEBHOOK_URL"):
             results["dingtalk"] = self._send_dingtalk(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # 企业微信
         if self.config.get("WEWORK_WEBHOOK_URL"):
             results["wework"] = self._send_wework(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # Telegram（需要配对验证）
         if self.config.get("TELEGRAM_BOT_TOKEN") and self.config.get("TELEGRAM_CHAT_ID"):
             results["telegram"] = self._send_telegram(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # ntfy（需要配对验证）
         if self.config.get("NTFY_SERVER_URL") and self.config.get("NTFY_TOPIC"):
             results["ntfy"] = self._send_ntfy(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # Bark
         if self.config.get("BARK_URL"):
             results["bark"] = self._send_bark(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # Slack
         if self.config.get("SLACK_WEBHOOK_URL"):
             results["slack"] = self._send_slack(
-                report_data, report_type, update_info, proxy_url, mode
+                content_to_send, report_type, update_info, proxy_url, mode
             )
 
         # 邮件（保持原有逻辑，已支持多收件人）

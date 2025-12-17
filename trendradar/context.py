@@ -94,6 +94,12 @@ class AppContext:
     def platforms(self) -> List[Dict]:
         """获取平台配置列表"""
         return self.config.get("PLATFORMS", [])
+    
+    @property
+    def ai_config(self) -> Optional[Dict]:
+        """获取AI处理配置"""
+        report_config = self.config.get("REPORT_CONFIG", {})
+        return report_config.get("ai_processing")
 
     @property
     def platform_ids(self) -> List[str]:
@@ -251,6 +257,7 @@ class AppContext:
             rank_threshold=self.rank_threshold,
             matches_word_groups_func=self.matches_word_groups,
             load_frequency_words_func=self.load_frequency_words,
+            ai_config=self.ai_config,
         )
 
     def generate_html(
@@ -282,6 +289,7 @@ class AppContext:
             matches_word_groups_func=self.matches_word_groups,
             load_frequency_words_func=self.load_frequency_words,
             enable_index_copy=True,
+            ai_config=self.ai_config,
         )
 
     def render_html(

@@ -149,6 +149,60 @@ def prepare_report_data(
             }
         )
 
+    # AI智能处理
+    if ai_processor and ai_processor.enabled:
+        logger.info("开始AI智能处理...")
+        
+        # 收集所有新闻数据进行AI处理
+        all_news_items = []
+        
+        # 处理统计数据中的新闻
+        for stat in processed_stats:
+            for title_data in stat["titles"]:
+                news_item = {
+                    "title": title_data["title"],
+                    "content": title_data.get("content", ""),
+                    "url": title_data.get("url", ""),
+                    "source": title_data.get("source_name", ""),
+                    "keyword": stat["word"]
+                }
+                all_news_items.append(news_item)
+        
+        # 处理新增新闻
+        for source in processed_new_titles:
+            for title_data in source["titles"]:
+                news_item = {
+                    "title": title_data["title"],
+                    "content": title_data.get("content", ""),
+                    "url": title_data.get("url", ""),
+                    "source": title_data.get("source_name", ""),
+                    "keyword": "新增热点"
+                }
+                all_news_items.append(news_item)
+        
+        # 执行AI处理
+        if all_news_items:
+            processed_news = ai_processor.process_news_list(all_news_items)
+            categorized_news = ai_processor.categorize_news(processed_news)
+            
+            # 如果启用视频格式，生成格式化内容
+            if ai_processor.video_format:
+                formatted_content = ai_processor.format_for_video(categorized_news)
+                logger.info("AI处理完成，生成视频友好格式")
+                
+                # 将AI处理结果添加到返回数据中
+                return {
+                    "stats": processed_stats,
+                    "new_titles": processed_new_titles,
+                    "failed_ids": failed_ids or [],
+                    "total_new_count": sum(
+                        len(source["titles"]) for source in processed_new_titles
+                    ),
+                    "ai_processed": True,
+                    "ai_content": formatted_content,
+                    "ai_categories": categorized_news,
+                }
+
     return {
         "stats": processed_stats,
         "new_titles": processed_new_titles,

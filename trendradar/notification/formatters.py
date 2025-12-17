@@ -8,6 +8,38 @@
 import re
 
 
+def format_ai_content_for_platform(ai_content: str, platform: str) -> str:
+    """
+    将AI生成的内容格式化为特定平台格式
+    
+    Args:
+        ai_content: AI生成的格式化内容
+        platform: 目标平台 (feishu/dingtalk/wework/telegram/etc.)
+        
+    Returns:
+        适配平台的格式化内容
+    """
+    if not ai_content:
+        return ""
+    
+    # 不同平台的格式适配
+    if platform in ["feishu", "dingtalk"]:
+        # 飞书和钉钉支持markdown格式，保持原样
+        return ai_content
+    elif platform == "wework":
+        # 企业微信根据消息类型决定
+        return ai_content
+    elif platform == "telegram":
+        # Telegram支持markdown，保持原样
+        return ai_content
+    elif platform in ["bark", "ntfy"]:
+        # 移动推送平台，简化格式
+        return strip_markdown(ai_content)
+    else:
+        # 默认保持原格式
+        return ai_content
+
+
 def strip_markdown(text: str) -> str:
     """去除文本中的 markdown 语法格式，用于个人微信推送
 
