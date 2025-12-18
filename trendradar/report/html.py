@@ -664,65 +664,65 @@ def render_html_content(
         # 生成新增新闻区域的HTML  
         new_titles_html = ""
         if report_data["new_titles"]:
-        new_titles_html += f"""
+            new_titles_html += f"""
                 <div class="new-section">
                     <div class="new-section-title">本次新增热点 (共 {report_data['total_new_count']} 条)</div>"""
 
-        for source_data in report_data["new_titles"]:
-            escaped_source = html_escape(source_data["source_name"])
-            titles_count = len(source_data["titles"])
-
-            new_titles_html += f"""
-                    <div class="new-source-group">
-                        <div class="new-source-title">{escaped_source} · {titles_count}条</div>"""
-
-            # 为新增新闻也添加序号
-            for idx, title_data in enumerate(source_data["titles"], 1):
-                ranks = title_data.get("ranks", [])
-
-                # 处理新增新闻的排名显示
-                rank_class = ""
-                if ranks:
-                    min_rank = min(ranks)
-                    if min_rank <= 3:
-                        rank_class = "top"
-                    elif min_rank <= title_data.get("rank_threshold", 10):
-                        rank_class = "high"
-
-                    if len(ranks) == 1:
-                        rank_text = str(ranks[0])
-                    else:
-                        rank_text = f"{min(ranks)}-{max(ranks)}"
-                else:
-                    rank_text = "?"
+            for source_data in report_data["new_titles"]:
+                escaped_source = html_escape(source_data["source_name"])
+                titles_count = len(source_data["titles"])
 
                 new_titles_html += f"""
+                        <div class="new-source-group">
+                            <div class="new-source-title">{escaped_source} · {titles_count}条</div>"""
+
+                # 为新增新闻也添加序号
+                for idx, title_data in enumerate(source_data["titles"], 1):
+                    ranks = title_data.get("ranks", [])
+
+                    # 处理新增新闻的排名显示
+                    rank_class = ""
+                    if ranks:
+                        min_rank = min(ranks)
+                        if min_rank <= 3:
+                            rank_class = "top"
+                        elif min_rank <= title_data.get("rank_threshold", 10):
+                            rank_class = "high"
+
+                        if len(ranks) == 1:
+                            rank_text = str(ranks[0])
+                        else:
+                            rank_text = f"{min(ranks)}-{max(ranks)}"
+                    else:
+                        rank_text = "?"
+
+                    new_titles_html += f"""
                         <div class="new-item">
                             <div class="new-item-number">{idx}</div>
                             <div class="new-item-rank {rank_class}">{rank_text}</div>
                             <div class="new-item-content">
                                 <div class="new-item-title">"""
 
-                # 处理新增新闻的链接
-                escaped_title = html_escape(title_data["title"])
-                link_url = title_data.get("mobile_url") or title_data.get("url", "")
+                    # 处理新增新闻的链接
+                    escaped_title = html_escape(title_data["title"])
+                    link_url = title_data.get("mobile_url") or title_data.get("url", "")
 
-                if link_url:
-                    escaped_url = html_escape(link_url)
-                    new_titles_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-                else:
-                    new_titles_html += escaped_title
+                    if link_url:
+                        escaped_url = html_escape(link_url)
+                        new_titles_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
+                    else:
+                        new_titles_html += escaped_title
+
+                    new_titles_html += """
+                                    </div>
+                                </div>
+                            </div>"""
 
                 new_titles_html += """
-                                </div>
-                            </div>
                         </div>"""
 
             new_titles_html += """
                     </div>"""
-
-        new_titles_html += """
-                </div>"""
 
     # 根据配置决定内容顺序
     if reverse_content_order:
