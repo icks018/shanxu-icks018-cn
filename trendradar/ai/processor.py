@@ -20,10 +20,12 @@ class AIProcessor:
         self.config = config
         self.enabled = config.get("enabled", False)
         self.provider = config.get("provider", "zhipu")
-        self.summary_length = config.get("summary_length", 100)
+        self.summary_length = config.get("summary_length", 150)
         self.title_length = config.get("title_length", 30)
         self.tags_count = config.get("tags_count", 1)
         self.video_format = config.get("video_format", True)
+        self.generate_script = config.get("generate_script", True)
+        self.generate_storyboard = config.get("generate_storyboard", True)
         
         print(f"🔍 AI配置: enabled={self.enabled}, provider={self.provider}")
         
@@ -149,17 +151,164 @@ class AIProcessor:
         
         return categories
     
-    def format_for_video(self, categorized_news: Dict[str, List[Dict[str, Any]]]) -> str:
-        """格式化为视频友好格式
+    def format_for_video(self, categorized_news: Dict[str, List[Dict]]) -> str:
+        """将分类新闻格式化为视频友好的文本
         
         Args:
-            categorized_news: 按类别分组的新闻
+            categorized_news: 分类后的新闻数据
             
         Returns:
-            格式化后的文本
+            格式化后的视频文本
         """
-        if not self.video_format:
-            return self._format_traditional(categorized_news)
+        if not categorized_news:
+            return "暂无新闻内容"
+        
+        result = {}
+        
+        # 生成基础格式化内容
+        formatted_text = self._generate_basic_format(categorized_news)
+        result["basic_format"] = formatted_text
+        
+        # 生成完整视频稿子
+        if self.generate_script:
+            video_script = self._generate_video_script(categorized_news)
+            result["video_script"] = video_script
+        
+        # 生成分镜脚本
+        if self.generate_storyboard:
+            storyboard = self._generate_storyboard(categorized_news)
+            result["storyboard"] = storyboard
+        
+        # 返回组合内容
+        return self._combine_all_formats(result)
+    
+    def _generate_basic_format(self, categorized_news: Dict[str, List[Dict]]) -> str:
+        """生成基础格式化内容"""
+        formatted_text = "📺 今日科技热点播报\n\n"
+        
+        # 按分类顺序处理
+        category_order = ["科技AI类", "游戏娱乐类", "硬件数码类"]
+        
+        for category in category_order:
+            if category in categorized_news and categorized_news[category]:
+                formatted_text += f"🔸 {category}\n"
+                
+                for i, news in enumerate(categorized_news[category], 1):
+                    title = news.get("ai_title", news.get("title", ""))
+                    summary = news.get("ai_summary", "")
+                    tag = news.get("ai_tag", "")
+                    url = news.get("url", "")
+                    
+                    formatted_text += f"{i}. {title}\n"
+                    if summary:
+                        formatted_text += f"   {summary}\n"
+                    if tag:
+                        formatted_text += f"   标签: {tag}\n"
+                    if url:
+                        formatted_text += f"   链接: {url}\n"
+                    formatted_text += "\n"
+                
+                formatted_text += "\n"
+        
+        return formatted_text
+    
+    def _generate_video_script(self, categorized_news: Dict[str, List[Dict]]) -> str:
+        """生成完整视频播报稿"""
+        script = "🎬 视频播报稿\n\n"
+        script += "大家好，欢迎收看今日科技热点播报。我是您的AI主播，为您带来最新的科技资讯。\n\n"
+        
+        category_order = ["科技AI类", "游戏娱乐类", "硬件数码类"]
+        category_intros = {
+            "科技AI类": "首先，让我们关注人工智能和科技创新领域的最新动态。",
+            "游戏娱乐类": "接下来，我们来看看游戏娱乐行业的热门资讯。", 
+            "硬件数码类": "最后，让我们了解一下硬件数码市场的最新消息。"
+        }
+        
+        for category in category_order:
+            if category in categorized_news and categorized_news[category]:
+                script += f"【{category}】\n"
+                script += f"{category_intros[category]}\n\n"
+                
+                for i, news in enumerate(categorized_news[category], 1):
+                    title = news.get("ai_title", news.get("title", ""))
+                    summary = news.get("ai_summary", "")
+                    
+                    script += f"第{i}条新闻：{title}\n"
+                    if summary:
+                        script += f"{summary}\n"
+                    script += "\n"
+                
+                script += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        
+        script += "以上就是今日的科技热点播报，感谢您的收看，我们明天同一时间再见！\n"
+        
+        return script
+    
+    def _generate_storyboard(self, categorized_news: Dict[str, List[Dict]]) -> str:
+        """生成分镜脚本"""
+        storyboard = "🎥 分镜脚本\n\n"
+        
+        # 开场
+        storyboard += "【镜头1】开场 (0:00-0:05)\n"
+        storyboard += "画面：主播正面特写，背景为科技感十足的虚拟演播室\n"
+        storyboard += "文案：大家好，欢迎收看今日科技热点播报\n"
+        storyboard += "转场：淡入淡出\n\n"
+        
+        category_order = ["科技AI类", "游戏娱乐类", "硬件数码类"]
+        category_visuals = {
+            "科技AI类": "AI芯片、机器人、代码界面等科技元素",
+            "游戏娱乐类": "游戏画面、手柄、电竞场景等娱乐元素",
+            "硬件数码类": "手机、电脑、芯片等硬件产品"
+        }
+        
+        time_offset = 5  # 开场5秒后开始
+        
+        for category_idx, category in enumerate(category_order, 2):
+            if category in categorized_news and categorized_news[category]:
+                news_count = len(categorized_news[category])
+                segment_duration = min(30, news_count * 8)  # 每条新闻约8秒，最多30秒
+                
+                start_time = time_offset
+                end_time = time_offset + segment_duration
+                
+                storyboard += f"【镜头{category_idx}】{category} ({start_time//60}:{start_time%60:02d}-{end_time//60}:{end_time%60:02d})\n"
+                storyboard += f"画面：{category_visuals[category]}\n"
+                storyboard += f"内容：播报{news_count}条{category}新闻\n"
+                storyboard += "转场：滑动切换\n\n"
+                
+                time_offset = end_time
+        
+        # 结尾
+        end_start = time_offset
+        end_end = time_offset + 5
+        storyboard += f"【镜头{len(category_order)+2}】结尾 ({end_start//60}:{end_start%60:02d}-{end_end//60}:{end_end%60:02d})\n"
+        storyboard += "画面：主播挥手告别，显示订阅提醒\n"
+        storyboard += "文案：感谢收看，明天同一时间再见\n"
+        storyboard += "转场：淡出\n\n"
+        
+        storyboard += f"总时长：约{end_end//60}分{end_end%60:02d}秒\n"
+        
+        return storyboard
+    
+    def _combine_all_formats(self, result: Dict[str, str]) -> str:
+        """组合所有格式化内容"""
+        combined = ""
+        
+        if "basic_format" in result:
+            combined += result["basic_format"] + "\n"
+        
+        if "video_script" in result:
+            combined += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            combined += result["video_script"] + "\n"
+        
+        if "storyboard" in result:
+            combined += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            combined += result["storyboard"]
+        
+        return combined
+    
+    def _format_traditional(self, categorized_news: Dict[str, List[Dict]]) -> str:
+        """传统格式化方法（兼容性保留）"""
         
         from datetime import datetime
         today = datetime.now().strftime("%Y-%m-%d")
@@ -199,27 +348,6 @@ class AIProcessor:
                 output_lines.append(f"🔗 [{source}]({url})")
                 output_lines.append(f"#{tag}")
                 output_lines.append("")
-            
-            output_lines.append("")
-        
-        return "\n".join(output_lines)
-    
-    def _format_traditional(self, categorized_news: Dict[str, List[Dict[str, Any]]]) -> str:
-        """传统格式化方式"""
-        output_lines = []
-        
-        for category, news_list in categorized_news.items():
-            if not news_list:
-                continue
-                
-            output_lines.append(f"## {category}")
-            
-            for news_item in news_list:
-                title = news_item.get("title", "")
-                url = news_item.get("url", "")
-                source = news_item.get("source", "")
-                
-                output_lines.append(f"- [{title}]({url}) - {source}")
             
             output_lines.append("")
         
