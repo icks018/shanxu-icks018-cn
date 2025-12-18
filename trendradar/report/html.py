@@ -541,25 +541,43 @@ def render_html_content(
                     </ul>
                 </div>"""
 
-    # 生成热点词汇统计部分的HTML
-    stats_html = ""
-    if report_data["stats"]:
-        total_count = len(report_data["stats"])
+    # 检查是否有AI处理的内容
+    if report_data.get("ai_processed") and report_data.get("ai_content"):
+        # 使用AI处理后的格式化内容
+        ai_content = report_data["ai_content"]
+        
+        # 将AI内容转换为HTML格式
+        ai_html = f"""
+                <div class="ai-section">
+                    <div class="ai-section-title">🤖 AI智能处理后的内容</div>
+                    <div class="ai-content">
+                        <pre style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;">{html_escape(ai_content)}</pre>
+                    </div>
+                </div>"""
+        
+        # 直接使用AI内容，跳过原始数据处理
+        stats_html = ai_html
+        new_titles_html = ""
+    else:
+        # 原始逻辑：生成热点词汇统计部分的HTML
+        stats_html = ""
+        if report_data["stats"]:
+            total_count = len(report_data["stats"])
 
-        for i, stat in enumerate(report_data["stats"], 1):
-            count = stat["count"]
+            for i, stat in enumerate(report_data["stats"], 1):
+                count = stat["count"]
 
-            # 确定热度等级
-            if count >= 10:
-                count_class = "hot"
-            elif count >= 5:
-                count_class = "warm"
-            else:
-                count_class = ""
+                # 确定热度等级
+                if count >= 10:
+                    count_class = "hot"
+                elif count >= 5:
+                    count_class = "warm"
+                else:
+                    count_class = ""
 
-            escaped_word = html_escape(stat["word"])
+                escaped_word = html_escape(stat["word"])
 
-            stats_html += f"""
+                stats_html += f"""
                 <div class="word-group">
                     <div class="word-header">
                         <div class="word-info">
@@ -569,83 +587,83 @@ def render_html_content(
                         <div class="word-index">{i}/{total_count}</div>
                     </div>"""
 
-            # 处理每个词组下的新闻标题，给每条新闻标上序号
-            for j, title_data in enumerate(stat["titles"], 1):
-                is_new = title_data.get("is_new", False)
-                new_class = "new" if is_new else ""
+                # 处理每个词组下的新闻标题，给每条新闻标上序号
+                for j, title_data in enumerate(stat["titles"], 1):
+                    is_new = title_data.get("is_new", False)
+                    new_class = "new" if is_new else ""
 
-                stats_html += f"""
+                    stats_html += f"""
                     <div class="news-item {new_class}">
                         <div class="news-number">{j}</div>
                         <div class="news-content">
                             <div class="news-header">
                                 <span class="source-name">{html_escape(title_data["source_name"])}</span>"""
 
-                # 处理排名显示
-                ranks = title_data.get("ranks", [])
-                if ranks:
-                    min_rank = min(ranks)
-                    max_rank = max(ranks)
-                    rank_threshold = title_data.get("rank_threshold", 10)
+                    # 处理排名显示
+                    ranks = title_data.get("ranks", [])
+                    if ranks:
+                        min_rank = min(ranks)
+                        max_rank = max(ranks)
+                        rank_threshold = title_data.get("rank_threshold", 10)
 
-                    # 确定排名等级
-                    if min_rank <= 3:
-                        rank_class = "top"
-                    elif min_rank <= rank_threshold:
-                        rank_class = "high"
-                    else:
-                        rank_class = ""
+                        # 确定排名等级
+                        if min_rank <= 3:
+                            rank_class = "top"
+                        elif min_rank <= rank_threshold:
+                            rank_class = "high"
+                        else:
+                            rank_class = ""
 
-                    if min_rank == max_rank:
-                        rank_text = str(min_rank)
-                    else:
-                        rank_text = f"{min_rank}-{max_rank}"
+                        if min_rank == max_rank:
+                            rank_text = str(min_rank)
+                        else:
+                            rank_text = f"{min_rank}-{max_rank}"
 
-                    stats_html += f'<span class="rank-num {rank_class}">{rank_text}</span>'
+                        stats_html += f'<span class="rank-num {rank_class}">{rank_text}</span>'
 
-                # 处理时间显示
-                time_display = title_data.get("time_display", "")
-                if time_display:
-                    # 简化时间显示格式，将波浪线替换为~
-                    simplified_time = (
-                        time_display.replace(" ~ ", "~")
-                        .replace("[", "")
-                        .replace("]", "")
-                    )
-                    stats_html += (
-                        f'<span class="time-info">{html_escape(simplified_time)}</span>'
-                    )
+                    # 处理时间显示
+                    time_display = title_data.get("time_display", "")
+                    if time_display:
+                        # 简化时间显示格式，将波浪线替换为~
+                        simplified_time = (
+                            time_display.replace(" ~ ", "~")
+                            .replace("[", "")
+                            .replace("]", "")
+                        )
+                        stats_html += (
+                            f'<span class="time-info">{html_escape(simplified_time)}</span>'
+                        )
 
-                # 处理出现次数
-                count_info = title_data.get("count", 1)
-                if count_info > 1:
-                    stats_html += f'<span class="count-info">{count_info}次</span>'
+                    # 处理出现次数
+                    count_info = title_data.get("count", 1)
+                    if count_info > 1:
+                        stats_html += f'<span class="count-info">{count_info}次</span>'
 
-                stats_html += """
+                    stats_html += """
                             </div>
                             <div class="news-title">"""
 
-                # 处理标题和链接
-                escaped_title = html_escape(title_data["title"])
-                link_url = title_data.get("mobile_url") or title_data.get("url", "")
+                    # 处理标题和链接
+                    escaped_title = html_escape(title_data["title"])
+                    link_url = title_data.get("mobile_url") or title_data.get("url", "")
 
-                if link_url:
-                    escaped_url = html_escape(link_url)
-                    stats_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
-                else:
-                    stats_html += escaped_title
+                    if link_url:
+                        escaped_url = html_escape(link_url)
+                        stats_html += f'<a href="{escaped_url}" target="_blank" class="news-link">{escaped_title}</a>'
+                    else:
+                        stats_html += escaped_title
 
-                stats_html += """
+                    stats_html += """
                             </div>
                         </div>
                     </div>"""
 
-            stats_html += """
+                stats_html += """
                 </div>"""
 
-    # 生成新增新闻区域的HTML
-    new_titles_html = ""
-    if report_data["new_titles"]:
+        # 生成新增新闻区域的HTML  
+        new_titles_html = ""
+        if report_data["new_titles"]:
         new_titles_html += f"""
                 <div class="new-section">
                     <div class="new-section-title">本次新增热点 (共 {report_data['total_new_count']} 条)</div>"""
